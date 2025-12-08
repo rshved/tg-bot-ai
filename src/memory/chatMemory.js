@@ -1,28 +1,45 @@
-// chatId -> [{ role, content }]
-const historyByChatId = new Map();
+const { getUserByTelegramId, createUser } = require('../db/userRepository');
+const { addMessage: addMsgDB, getMessagesByUser } = require('../db/messageRepository');
+const db = require('../db/index');
 
-function getHistory(chatId) {
-  return historyByChatId.get(chatId) || [];
-}
 
-function setHistory(chatId, messages) {
-  historyByChatId.set(chatId, messages);
+function getHistory(chatId, maxHistory = 20) {
+  createUser(chatId); // подстраховка
+  const user = getUserByTelegramId(chatId);
+
+  return getMessagesByUser(user.id, maxHistory).map(msg => ({
+    role: msg.role,
+    content: msg.content,
+  }));
 }
 
 function resetHistory(chatId) {
-  historyByChatId.delete(chatId);
+  createUser(chatId);
+  const user = getUserByTelegramId(chatId);
+
+  db.prepare('DELETE FROM messages WHERE user_id = ?').run(user.id);
 }
 
 function addMessage(chatId, message, maxHistory = 20) {
-  const history = getHistory(chatId);
-  history.push(message);
+  createUser(chatId);
+  const user = getUserByTelegramId(chatId);
 
-  const trimmed =
-    history.length > maxHistory
-      ? history.slice(history.length - maxHistory)
-      : history;
+  // вставляем в БД
+  addMsgDB(user.id, message.role, message.content);
 
-  setHistory(chatId, trimmed);
+  // ограничение истории
+  const messages = getMessagesByUser(user.id, maxHistory + 5); // небольшой буфер
+  if (messages.length > maxHistory) {
+    const idsToDelete = messages
+      .slice(0, messages.length - maxHistory)
+      .map(m => m.id);
+
+    if (idsToDelete.length > 0) {
+      db.prepare(
+        `DELETE FROM messages WHERE id IN (${idsToDelete.map(() => '?').join(',')})`
+      ).run(...idsToDelete);
+    }
+  }
 }
 
 module.exports = {

@@ -1,9 +1,8 @@
-const OpenAI = require('openai');
-const fetch = require('node-fetch');
-const fs = require('fs');
-const path = require('path');
-const os = require('os');
-
+const OpenAI = require("openai");
+const fetch = require("node-fetch");
+const fs = require("fs");
+const path = require("path");
+const os = require("os");
 
 class OpenAiClient {
   /**
@@ -14,12 +13,12 @@ class OpenAiClient {
     this.model = options.model;
     this.systemPrompt =
       options.systemPrompt ||
-      'Ты дружелюбный ассистент. Отвечай кратко и по делу.';
+      "Ты дружелюбный ассистент. Отвечай кратко и по делу.";
   }
 
   async generateReply(messages) {
     const fullMessages = [
-      { role: 'system', content: this.systemPrompt },
+      { role: "system", content: this.systemPrompt },
       ...messages,
     ];
 
@@ -31,11 +30,13 @@ class OpenAiClient {
     return response.choices[0].message.content;
   }
 
-   async transcribeVoiceFromUrl(fileUrl) {
+  async transcribeVoiceFromUrl(fileUrl) {
     // 1. Скачиваем файл
     const res = await fetch(fileUrl);
     if (!res.ok) {
-      throw new Error(`Failed to download voice file: ${res.status} ${res.statusText}`);
+      throw new Error(
+        `Failed to download voice file: ${res.status} ${res.statusText}`
+      );
     }
 
     const arrayBuffer = await res.arrayBuffer();
@@ -51,8 +52,8 @@ class OpenAiClient {
 
       const transcription = await this.client.audio.transcriptions.create({
         file: readStream,
-        model: 'whisper-1', // можно поменять на gpt-4o-transcribe, если захочешь
-        language: 'ru',      // подсказываем, что говоришь по-русски
+        model: "whisper-1", // можно поменять на gpt-4o-transcribe, если захочешь
+        language: "ru", // подсказываем, что говоришь по-русски
       });
 
       return transcription.text;
@@ -71,28 +72,28 @@ class OpenAiClient {
           content: [
             {
               type: "text",
-              text: prompt
+              text: prompt,
             },
             {
               type: "image_url",
               image_url: {
-                url: fileUrl
-              }
-            }
-          ]
-        }
-      ]
+                url: fileUrl,
+              },
+            },
+          ],
+        },
+      ],
     });
 
     return response.choices[0].message.content;
   }
 
-   async generateImage(prompt) {
+  async generateImage(prompt) {
     const response = await this.client.images.generate({
-      model: 'gpt-image-1', // модель для генерации картинок
+      model: "gpt-image-1", // модель для генерации картинок
       prompt,
-      size: '1024x1024',
-      n: 1
+      size: "1024x1024",
+      n: 1,
     });
 
     // в новом SDK ответы лежат в response.data[]
@@ -104,9 +105,8 @@ class OpenAiClient {
     }
 
     // если вдруг вернётся base64 — можно будет допилить, но пока не заморачиваемся
-    throw new Error('Image URL not found in OpenAI response');
+    throw new Error("Image URL not found in OpenAI response");
   }
-
 }
 
 module.exports = { OpenAiClient };

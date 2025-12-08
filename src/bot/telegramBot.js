@@ -1,7 +1,10 @@
-const { Telegraf } = require('telegraf');
-const { createMessageHandler } = require('../handlers/messageHandler');
-const { createVoiceHandler } = require('../handlers/voiceHandler');
-const { createPhotoHandler } = require('../handlers/photoHandler');
+const { Telegraf } = require("telegraf");
+const { createMessageHandler } = require("../handlers/messageHandler");
+const { createVoiceHandler } = require("../handlers/voiceHandler");
+const { createPhotoHandler } = require("../handlers/photoHandler");
+
+import { createUser } from "../db/userRepository.js";
+
 
 function createTelegramBot({ config, llmClient }) {
   const bot = new Telegraf(config.telegramToken);
@@ -10,24 +13,28 @@ function createTelegramBot({ config, llmClient }) {
   const handleVoiceMessage = createVoiceHandler({ llmClient, config });
   const handlePhotoMessage = createPhotoHandler({ llmClient, config });
 
-   bot.start((ctx) =>
-    ctx.reply(
-      'Привет! Я ИИ-бот 🤖\n' +
-        '— Пиши текст\n' +
-        '— Отправляй голосовые\n' +
-        '— Шли картинки\n' +
-        'Команда /reset — очистить историю диалога.',
-    ),
-  );
+  bot.start((ctx) => {
+    const tgId = String(ctx.from.id);
+    const username = ctx.from.username || null;
+    
+    createUser(tgId, username);
+    return ctx.reply(
+      "Привет! Я ИИ-бот 🤖\n" +
+        "— Пиши текст\n" +
+        "— Отправляй голосовые\n" +
+        "— Шли картинки\n" +
+        "Команда /reset — очистить историю диалога."
+    );
+  });
 
   bot.help((ctx) =>
     ctx.reply(
-      'Я ИИ-бот.\n' +
-        'Текст — просто напиши сообщение.\n' +
-        'Голос — отправь voice.\n' +
-        'Картинка — просто пришли фото, я опишу.\n' +
-        '/reset — очистить историю.',
-    ),
+      "Я ИИ-бот.\n" +
+        "Текст — просто напиши сообщение.\n" +
+        "Голос — отправь voice.\n" +
+        "Картинка — просто пришли фото, я опишу.\n" +
+        "/reset — очистить историю."
+    )
   );
   // '/image <описание> — сгенерирую картинку.\n' + '— Команда /image <описание> — сгенерировать картинку\n' +
 
@@ -57,16 +64,14 @@ function createTelegramBot({ config, llmClient }) {
   //   }
   // });
 
-  bot.on('text', handleTextMessage);
+  bot.on("text", handleTextMessage);
 
-  if (typeof llmClient.transcribeVoiceFromUrl === 'function') {
-    bot.on('voice', handleVoiceMessage);
+  if (typeof llmClient.transcribeVoiceFromUrl === "function") {
+    bot.on("voice", handleVoiceMessage);
   }
 
-  
-
-  if (typeof llmClient.analyzeImageFromUrl === 'function') {
-    bot.on('photo', handlePhotoMessage);
+  if (typeof llmClient.analyzeImageFromUrl === "function") {
+    bot.on("photo", handlePhotoMessage);
   }
 
   return bot;
