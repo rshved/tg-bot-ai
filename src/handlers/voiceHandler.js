@@ -44,7 +44,7 @@ function createVoiceHandler({ llmClient, config }) {
       );
 
       // 5. Отправляем результат
-      await ctx.reply(`Я понял из голосового:\n"${text}"\n\nОтвет:\n${answer}`);
+      await ctx.reply(answer);
     } catch (error) {
       console.error("Error while handling voice message:", error);
       await ctx.reply(
