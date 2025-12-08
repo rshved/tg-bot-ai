@@ -12,8 +12,7 @@ class OpenAiClient {
     this.client = new OpenAI({ apiKey: options.apiKey });
     this.model = options.model;
     this.systemPrompt =
-      options.systemPrompt ||
-      "Ты дружелюбный ассистент. Отвечай кратко и по делу.";
+      options.systemPrompt;
   }
 
   async generateReply(messages, stylePrompt = "") {
