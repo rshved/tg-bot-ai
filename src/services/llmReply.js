@@ -7,10 +7,10 @@ async function llmReply(ctx, messages, llmClient) {
   const style = user?.response_style || "normal";
 
   const stylePrompt = {
-    short: "Отвечай очень кратко. Максимум 1–2 предложения.",
-    long: "Отвечай максимально подробно. Раскрывай каждую мысль.",
-    normal: ""
-  }[style];
+  short: "Отвечай очень кратко. Максимум 1–2 предложения.",
+  normal: "",
+  long: "Пиши максимально подробно, в большом объёме, раскрывая каждый аспект вопроса, добавляя объяснения, примеры и контекст. Не сокращай.",
+}[style];
 
   return await llmClient.generateReply(messages, stylePrompt);
 }
