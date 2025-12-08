@@ -1,6 +1,6 @@
-import db from './index.js';
+const db = require('./index.js');
 
-export function createUser(telegramId, username) {
+function createUser(telegramId, username) {
   const stmt = db.prepare(`
     INSERT OR IGNORE INTO users (telegram_id, username)
     VALUES (?, ?)
@@ -9,8 +9,13 @@ export function createUser(telegramId, username) {
   stmt.run(telegramId, username);
 }
 
-export function getUserByTelegramId(telegramId) {
+function getUserByTelegramId(telegramId) {
   return db.prepare(`
     SELECT * FROM users WHERE telegram_id = ?
   `).get(telegramId);
 }
+
+module.exports = {
+  createUser,
+  getUserByTelegramId,
+};

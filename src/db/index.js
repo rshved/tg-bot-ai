@@ -1,10 +1,9 @@
-import Database from 'better-sqlite3';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import runMigrations from './migrations.js';
+const Database = require('better-sqlite3');
+const path = require('path');
+const runMigrations = require('./migrations.js');
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// __dirname и __filename в CommonJS есть автоматически
+// поэтому никакого fileURLToPath не нужно
 
 // путь до файла базы
 const dbPath = path.join(__dirname, 'database.db');
@@ -15,4 +14,4 @@ const db = new Database(dbPath);
 // прогоняем миграции (создание таблиц)
 runMigrations(db);
 
-export default db;
+module.exports = db;

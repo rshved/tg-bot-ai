@@ -1,6 +1,6 @@
-import db from './index.js';
+const db = require('./index.js');
 
-export function addMessage(userId, role, content) {
+function addMessage(userId, role, content) {
   const stmt = db.prepare(`
     INSERT INTO messages (user_id, role, content)
     VALUES (?, ?, ?)
@@ -9,7 +9,7 @@ export function addMessage(userId, role, content) {
   stmt.run(userId, role, content);
 }
 
-export function getMessagesByUser(userId, limit = 20) {
+function getMessagesByUser(userId, limit = 20) {
   return db.prepare(`
     SELECT role, content, created_at
     FROM messages
@@ -18,3 +18,8 @@ export function getMessagesByUser(userId, limit = 20) {
     LIMIT ?
   `).all(userId, limit).reverse();
 }
+
+module.exports = {
+  addMessage,
+  getMessagesByUser,
+};

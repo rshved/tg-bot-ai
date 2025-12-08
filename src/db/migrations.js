@@ -1,4 +1,4 @@
-export default function runMigrations(db) {
+function runMigrations(db) {
   db.exec(`
     CREATE TABLE IF NOT EXISTS users (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -19,3 +19,5 @@ export default function runMigrations(db) {
     );
   `);
 }
+
+module.exports = runMigrations;

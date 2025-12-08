@@ -3,8 +3,7 @@ const { createMessageHandler } = require("../handlers/messageHandler");
 const { createVoiceHandler } = require("../handlers/voiceHandler");
 const { createPhotoHandler } = require("../handlers/photoHandler");
 
-import { createUser } from "../db/userRepository.js";
-
+const { createUser } = require("../db/userRepository.js");
 
 function createTelegramBot({ config, llmClient }) {
   const bot = new Telegraf(config.telegramToken);

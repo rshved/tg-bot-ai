@@ -44,7 +44,6 @@ function addMessage(chatId, message, maxHistory = 20) {
 
 module.exports = {
   getHistory,
-  setHistory,
   resetHistory,
   addMessage,
 };
