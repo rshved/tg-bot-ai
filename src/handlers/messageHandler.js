@@ -1,4 +1,5 @@
 const { addMessage, getHistory, resetHistory } = require('../memory/chatMemory');
+const { llmReply } = require("../services/llmReply");
 
 function createMessageHandler({ llmClient, config }) {
   return async function handleTextMessage(ctx) {
@@ -21,7 +22,7 @@ function createMessageHandler({ llmClient, config }) {
         { role: 'user', content: userText },
       ];
 
-      const answer = await llmClient.generateReply(messagesForLlm);
+      const answer = await llmReply(ctx, messagesForLlm, llmClient);
 
       addMessage(chatId, { role: 'user', content: userText }, config.maxHistoryMessages);
       addMessage(chatId, { role: 'assistant', content: answer }, config.maxHistoryMessages);

@@ -15,7 +15,23 @@ function getUserByTelegramId(telegramId) {
   `).get(telegramId);
 }
 
+function setUserStyle(telegramId, style) {
+  db.prepare(`
+    UPDATE users SET response_style = ?
+    WHERE telegram_id = ?
+  `).run(style, telegramId);
+}
+
+function getUserStyle(telegramId) {
+  const row = db.prepare(`
+    SELECT response_style FROM users WHERE telegram_id = ?
+  `).get(telegramId);
+  return row?.response_style || 'normal';
+}
+
 module.exports = {
   createUser,
   getUserByTelegramId,
+  setUserStyle,
+  getUserStyle,
 };

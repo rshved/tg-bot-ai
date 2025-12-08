@@ -18,6 +18,14 @@ function runMigrations(db) {
       FOREIGN KEY (user_id) REFERENCES users(id)
     );
   `);
+
+  try {
+    db.exec(`
+      ALTER TABLE users ADD COLUMN response_style TEXT DEFAULT 'normal';
+    `);
+  } catch (e) {
+    // Если колонка уже есть — просто игнорируем ошибку
+  }
 }
 
 module.exports = runMigrations;

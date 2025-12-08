@@ -3,7 +3,7 @@ const { createMessageHandler } = require("../handlers/messageHandler");
 const { createVoiceHandler } = require("../handlers/voiceHandler");
 const { createPhotoHandler } = require("../handlers/photoHandler");
 
-const { createUser } = require("../db/userRepository.js");
+const { createUser, setUserStyle, getUserStyle } = require("../db/userRepository.js");
 
 function createTelegramBot({ config, llmClient }) {
   const bot = new Telegraf(config.telegramToken);
@@ -35,6 +35,45 @@ function createTelegramBot({ config, llmClient }) {
         "/reset — очистить историю."
     )
   );
+
+  bot.command("style", (ctx) => {
+    const chatId = String(ctx.chat.id);
+    const text = ctx.message.text.trim();
+    const parts = text.split(" ");
+
+    const style = parts[1];
+    const allowed = ["short", "normal", "long"];
+
+    if (!style) {
+      return ctx.reply(
+        "Выбери стиль ответа:\n" +
+          "/style short — очень кратко\n" +
+          "/style normal — обычные ответы\n" +
+          "/style long — максимально подробно"
+      );
+    }
+
+    if (!allowed.includes(style)) {
+      return ctx.reply("Недопустимый стиль. Используй: short, normal, long.");
+    }
+
+    setUserStyle(chatId, style);
+
+    ctx.reply(`Стиль ответа установлен: *${style}*`, {
+      parse_mode: "Markdown",
+    });
+  });
+
+
+  bot.command("mystyle", (ctx) => {
+    const chatId = String(ctx.chat.id);
+    const style = getUserStyle(chatId);
+
+    ctx.reply(`Твой текущий стиль ответа: *${style}*`, {
+      parse_mode: "Markdown",
+    });
+  });
+
   // '/image <описание> — сгенерирую картинку.\n' + '— Команда /image <описание> — сгенерировать картинку\n' +
 
   // bot.command('image', async (ctx) => {

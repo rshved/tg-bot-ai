@@ -1,4 +1,5 @@
 const { addMessage, getHistory } = require("../memory/chatMemory");
+const { llmReply } = require("../services/llmReply");
 
 function createVoiceHandler({ llmClient, config }) {
   return async function handleVoiceMessage(ctx) {
@@ -29,7 +30,7 @@ function createVoiceHandler({ llmClient, config }) {
 
       const messagesForLlm = [...history, { role: "user", content: text }];
 
-      const answer = await llmClient.generateReply(messagesForLlm);
+      const answer = await llmReply(ctx, messagesForLlm, llmClient);
 
       // 4. Обновляем историю
       addMessage(

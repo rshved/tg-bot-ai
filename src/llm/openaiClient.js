@@ -16,11 +16,14 @@ class OpenAiClient {
       "Ты дружелюбный ассистент. Отвечай кратко и по делу.";
   }
 
-  async generateReply(messages) {
-    const fullMessages = [
-      { role: "system", content: this.systemPrompt },
-      ...messages,
-    ];
+  async generateReply(messages, stylePrompt = "") {
+    const fullMessages = [{ role: "system", content: this.systemPrompt }];
+
+    if (stylePrompt) {
+      fullMessages.push({ role: "system", content: stylePrompt });
+    }
+
+    fullMessages.push(...messages);
 
     const response = await this.client.chat.completions.create({
       model: this.model,
