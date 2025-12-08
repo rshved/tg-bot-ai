@@ -1,21 +1,29 @@
 const db = require('./index.js');
 
-function createUser(telegramId, username) {
-  const stmt = db.prepare(`
-    INSERT OR IGNORE INTO users (telegram_id, username)
-    VALUES (?, ?)
-  `);
+// Гарантированно создаёт пользователя, если его нет
+function ensureUserExists(telegramId, username = null) {
+  db.prepare(`
+    INSERT INTO users (telegram_id, username, response_style)
+    VALUES (?, ?, 'normal')
+    ON CONFLICT(telegram_id) DO NOTHING
+  `).run(telegramId, username);
+}
 
-  stmt.run(telegramId, username);
+function createUser(telegramId, username) {
+  ensureUserExists(telegramId, username);
 }
 
 function getUserByTelegramId(telegramId) {
+  ensureUserExists(telegramId);
+
   return db.prepare(`
     SELECT * FROM users WHERE telegram_id = ?
   `).get(telegramId);
 }
 
 function setUserStyle(telegramId, style) {
+  ensureUserExists(telegramId);
+
   db.prepare(`
     UPDATE users SET response_style = ?
     WHERE telegram_id = ?
@@ -23,9 +31,12 @@ function setUserStyle(telegramId, style) {
 }
 
 function getUserStyle(telegramId) {
+  ensureUserExists(telegramId);
+
   const row = db.prepare(`
     SELECT response_style FROM users WHERE telegram_id = ?
   `).get(telegramId);
+
   return row?.response_style || 'normal';
 }
 
