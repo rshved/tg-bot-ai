@@ -20,11 +20,23 @@ function runMigrations(db) {
   `);
 
   try {
-    db.exec(`
-      ALTER TABLE users ADD COLUMN response_style TEXT DEFAULT 'normal';
+    const hasColumn = db
+      .prepare(
+        `
+    PRAGMA table_info(users);
+  `
+      )
+      .all()
+      .some((col) => col.name === "response_style");
+
+    if (!hasColumn) {
+      db.exec(`
+      ALTER TABLE users
+      ADD COLUMN response_style TEXT DEFAULT 'normal';
     `);
+    }
   } catch (e) {
-    // Если колонка уже есть — просто игнорируем ошибку
+    console.error("Migration error:", e);
   }
 }
 
