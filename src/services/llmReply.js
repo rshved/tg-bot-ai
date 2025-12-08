@@ -4,12 +4,12 @@ async function llmReply(ctx, messages, llmClient) {
   const chatId = ctx.chat.id;
   const user = getUserByTelegramId(String(chatId));
 
-  const style = user?.response_style || "normal";
+  const style = user?.response_style || "long";
 
   const stylePrompt = {
   short: "Отвечай очень кратко. Максимум 1–2 предложения.",
   normal: "",
-  long: "ПИШИ ПОДРОБНО, МНОГО ТЕКСТА, 5–10 ПРЕДЛОЖЕНИЙ.",
+  long: "ПИШИ ОЧЕНЬ ДОКРУЖНО. ОТВЕЧАЙ НЕ МЕНЬШЕ ЧЕМ НА 15 ПРЕДЛОЖЕНИЙ. ЕСЛИ КОРОТЬ — ТО ЭТО ОШИБКА. ПИШИ МНОГО.
 }[style];
 
   return await llmClient.generateReply(messages, stylePrompt);
