@@ -41,6 +41,7 @@ function addMessage(chatId, message, maxHistory = 20) {
     }
   }
 }
+console.log('chatMemory module loaded');
 
 module.exports = {
   getHistory,
