@@ -8,6 +8,7 @@
     "start": "node src/index.js"
   },
   "dependencies": {
+    "better-sqlite3": "^12.5.0",
     "dotenv": "^17.2.3",
     "node-fetch": "2",
     "openai": "^6.9.1",
